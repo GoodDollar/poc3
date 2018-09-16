@@ -1,0 +1,29 @@
+{
+  "name": "poc3",
+  "private": true,
+  "scripts": {
+    "start": "meteor run"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.0.0-beta.55",
+    "blockstack": "^17.2.0",
+    "ethereumjs-util": "^5.2.0",
+    "glamor": "^2.20.40",
+    "glamorous": "^4.13.1",
+    "lodash": "^4.17.10",
+    "material-ui": "^0.20.2",
+    "meteor-node-stubs": "^0.3.2",
+    "openzeppelin-solidity": "1.9.0",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2",
+    "react-joyride": "^2.0.0-14",
+    "react-material-ui-form-validator": "^1.1.4",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
+    "truffle-contract": "^3.0.5",
+    "web3": "^1.0.0-beta.35",
+    "web3-core-promievent": "^1.0.0-beta.36",
+    "web3-providers-ws": "^1.0.0-beta.36"
+  },
+  "devDependencies": {}
+}

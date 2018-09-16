@@ -1,0 +1,36 @@
+.--titan{
+    font-family: 'Titan One', cursive;
+}
+
+.balanceChanged{
+  transform: scale(1);
+  transition: transform 800ms ease-in;
+}
+.balanceChanged.changed {
+  transform: scale(1.5);
+  transition: transform 800ms ease-in;
+}
+
+/*-- LAYOUT --*/
+
+@media (min-width: 1200px) {
+	.container {
+		max-width: 760px;
+	}
+}
+
+/*-- FONTS --*/
+
+@font-face {
+	font-family: 'Freight Sans Pro Semibold';
+
+	src: url('../assets/fonts/freight-sans-pro-semibold.eot');
+	src: url('../assets/fonts/freight-sans-pro-semibold.woff2') format('woff2'),
+		url('../assets/fonts/freight-sans-pro-semibold.woff') format('woff'),
+		url('../assets/fonts/freight-sans-pro-semibold.ttf') format('truetype'),
+		url('../assets/fonts/freight-sans-pro-semibold.svg') format('svg');
+}
+
+.estimateRefresh:hover {
+  transform: rotate(180deg);
+}
