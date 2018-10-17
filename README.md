@@ -50,7 +50,8 @@ This installation assumes your contracts were deployed to the network you chose 
 1. From POC2 project, ,copy all json files under /build/contracts/ to /imports/contracts/.
 
 2.	Create “secrets.json” file similar to “secrets-example.json”, use your mnemonic & ropsten API.
-    ⋅⋅*a.	“Addr” should be the same address that deployed the contracts
+
+    ...“Addr” should be the same address that deployed the contracts
     ⋅⋅*b.	“pkey”: the above account private key (Verify your key has “0x” prefix, otherwise please add it)
 3.	Modify settings.json set “network_id” as follows:
     a.	6000 (ganache), or  
