@@ -103,7 +103,6 @@ export class Blockstack {
     return address
   }
   init() {
-
     let loginPromise
     if(blockstack.isUserSignedIn()) loginPromise = Promise.resolve({})
     else if(blockstack.isSignInPending()) {

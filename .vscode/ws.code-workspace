@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "D:\\projects\\gooddollar\\poc3"
+		}
+	],
+	"settings": {
+		"typescript.format.enable": false,
+		"typescript.validate.enable": false
+	}
+}

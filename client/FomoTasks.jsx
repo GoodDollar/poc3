@@ -111,8 +111,8 @@ export class VerifyHumanProofs extends React.Component {
     this.profileWindow.focus()
     this.profileWindow.onClose = function() { console.log("closed")}
     this.interval = setInterval(() => {
-      if(this.profileWindow.closed) {
-        this.recheck()
+      if(this.profileWindow.closed) { // After getting verification from block stack, goodDollar re-check by itself that the user has fulfilled blockstack terms.
+        this.recheck() // Public proof
         clearInterval(this.interval)
       }
 

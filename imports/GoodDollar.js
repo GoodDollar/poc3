@@ -25,6 +25,7 @@ export default class GoodDollar {
   pkey:string
   addr:string
   publicKey:Buffer
+  netword_id:number
 
 
   constructor(addr:string,pkey:string) {
@@ -32,12 +33,13 @@ export default class GoodDollar {
     this.addr = addr
     this.pkey = pkey
     this.publicKey = ethUtils.privateToPublic(ethUtils.toBuffer(pkey))
-    this.web3 = new Web3(new WebsocketProvider(Meteor.settings.public.infurawss));
+    this.web3 = new Web3(new WebsocketProvider(Meteor.settings.public.infurawss))
     this.web3.eth.accounts.wallet.add(pkey)
     this.web3.eth.defaultAccount = addr
-    this.accountsContract = new this.web3.eth.Contract(RedemptionContract.abi,'0xef672c34abc762590f18e6f9fb26739acf0f9da5',{from:addr})
-    this.tokenContract = new this.web3.eth.Contract(GoodDollarContract.abi,'0x495bf815fd7b065d8ab491ff4cc18b9bb472e04a',{from:addr})
-    this.marketContract = new this.web3.eth.Contract(MarketContract.abi,'0x27cc97cc4a32d6dd6c62864c0956a3d2f1144d53',{from:addr})
+    this.netword_id = Meteor.settings.public.network_id // ropsten network
+    this.accountsContract = new this.web3.eth.Contract(RedemptionContract.abi,RedemptionContract.networks[this.netword_id],{from:addr})
+    this.tokenContract = new this.web3.eth.Contract(GoodDollarContract.abi,GoodDollarContract.networks[this.netword_id],{from:addr})
+    this.marketContract = new this.web3.eth.Contract(MarketContract.abi,MarketContract.networks[this.netword_id],{from:addr})
     this.gasPrice = this.web3.eth.getGasPrice()
   }
 
@@ -140,4 +142,48 @@ export default class GoodDollar {
       return [txPromise,promisifyTxHash(txPromise)]
 
   }
+
+  /*
+      unitMap = {
+        '0': '1',
+        '1': '10',
+        '2': '100',
+        '3': '1000',
+        '4': '10000', // used for all base calculations, like wei
+      };
+      */
+    
+      // Should be part of "GDjs.js" - a utilty class for GoodDollar token.
+      toGDUnits(gdTokens, inWhichPrecision) {
+    
+        // Assumption: gdTokens are provided on the smallest presicion unit base (see map)
+    
+        let precision = parseInt(inWhichPrecision);
+        if ((precision != undefined) && (!isNaN(precision))) {
+    
+          let power = this.tokenDecimals - precision;
+          var convertedTokens = gdTokens * (10 ** power)
+          return convertedTokens;
+        } else {
+          return NaN;
+        }
+      }
+    
+        // Should be part of "GDjs.js" - a utilty class for GoodDollar token.
+    
+      fromGDUnits(gdTokens, toWhichPrecision) {
+    
+        // Assumption: gdTokens are provided on the smallest presicion unit base (see map)
+    
+        let precision = parseInt(toWhichPrecision);
+        if ((precision != undefined) && (!isNaN(precision))) {
+    
+          let power = this.tokenDecimals - precision;
+          let negativePower = power * -1;
+          var convertedTokens = gdTokens * (10 ** negativePower)
+          return convertedTokens;
+        } else {
+          return NaN;
+        }
+      }
 }
