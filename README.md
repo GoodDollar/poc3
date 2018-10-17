@@ -18,25 +18,25 @@ This installation will also deploy your contracts to the network you choose (Gan
 
 Choose Step 2 or step 3 according to the chosen network:
 2. To use with Ropsten / Hosted Blockchain:
-2.1.	Create “secrets.json” file similar to “secrets-example.json”, use your mnemonic & ropsten API.
-2.2. Install:
+⋅⋅2.1.	Create “secrets.json” file similar to “secrets-example.json”, use your mnemonic & ropsten API.
+⋅⋅2.2. Install:
 ```
 npm install
 ```
 
-2.3. Deploy the contracts:
+⋅⋅2.3. Deploy the contracts:
 ```
 truffle migrate --network ropsteninfura
 ```
 3. To use with Ganache:
-3.1	Verify Ganache is up and running.
-3.2.	In “truffle.js”, Modify “from” key under “development” and “test” networks according to your first address ganache UI.
-3.2. Install:
+⋅⋅3.1	Verify Ganache is up and running.
+⋅⋅3.2.	In “truffle.js”, Modify “from” key under “development” and “test” networks according to your first address ganache UI.
+⋅⋅3.3. Install:
 ```
 npm install
 ```
 
-3.3. Deploy the contracts:
+⋅⋅3.4. Deploy the contracts:
 ```
 truffle migrate --network development
 ```
@@ -45,11 +45,11 @@ truffle migrate --network development
 This installation assumes your contracts were deployed to the network you chose on the previous steps.
 1. From POC2 project, ,copy all json files under /build/contracts/ to /imports/contracts/.
 2.	Create “secrets.json” file similar to “secrets-example.json”, use your mnemonic & ropsten API.
-  2.a.	“Addr” should be the same address that deployed the contracts
-  2.b.	“pkey”: the above account private key (Verify your key has “0x” prefix, otherwise please add it)
+  ⋅⋅2.a.	“Addr” should be the same address that deployed the contracts
+  ⋅⋅2.b.	“pkey”: the above account private key (Verify your key has “0x” prefix, otherwise please add it)
 3.	Modify settings.json set “network_id” as follows:
-  a.	6000 (ganache), or  
-  b.	3 (ropsten) // or any other hosted blockchain provider id
+  ⋅⋅a.	6000 (ganache), or  
+  ⋅⋅b.	3 (ropsten) // or any other hosted blockchain provider id
 4.	Install:
 ```
 npm install
