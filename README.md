@@ -29,6 +29,7 @@ npm install
 ```
 truffle migrate --network ropsteninfura
 ```
+
 3. To use with Ganache:
   3.1	Verify Ganache is up and running.
   3.2.	In “truffle.js”, Modify “from” key under “development” and “test” networks according to your first address ganache UI.
