@@ -51,9 +51,11 @@ This installation assumes your contracts were deployed to the network you chose 
 
 2.	Create “secrets.json” file similar to “secrets-example.json”, use your mnemonic & ropsten API.
 
-    ...“Addr” should be the same address that deployed the contracts
-    ⋅⋅*b.	“pkey”: the above account private key (Verify your key has “0x” prefix, otherwise please add it)
+    a.“Addr” should be the same address that deployed the contracts
+    b.	“pkey”: the above account private key (Verify your key has “0x” prefix, otherwise please add it)
+    
 3.	Modify settings.json set “network_id” as follows:
+
     a.	6000 (ganache), or  
     b.	3 (ropsten) // or any other hosted blockchain provider id
 4.	Install:
