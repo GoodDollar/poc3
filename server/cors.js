@@ -3,6 +3,7 @@ Meteor.startup(() => {
     console.log("Setting cors")
     WebApp.rawConnectHandlers.use("/", function(req, res, next) {
       res.setHeader("Access-Control-Allow-Origin", "*");
+      debugger;
       return next();
     });
   }

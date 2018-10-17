@@ -47,7 +47,7 @@ export default class Login extends React.Component {
         blockstack.handlePendingSignIn().then(function(userData) {
           this.setState({loggedin:true})
         })
-        LoginDiv = <RaisedButton type="submit" label="Logining In...." style={styles.loginButton}/>
+        LoginDiv = <RaisedButton type="submit" label="Loggining In...." style={styles.loginButton}/>
       }
       else
         LoginDiv = <RaisedButton type="submit" label="Login with Blockstack" style={styles.loginButton} onClick={() => this.loginBlockstack()}/>

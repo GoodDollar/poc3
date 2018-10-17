@@ -2,7 +2,8 @@
   "name": "poc3",
   "private": true,
   "scripts": {
-    "start": "meteor run"
+    "start": "meteor run --settings settings.json",
+    "debug": "meteor run --inspect --settings settings.json"
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.55",
@@ -23,7 +24,7 @@
     "truffle-contract": "^3.0.5",
     "web3": "^1.0.0-beta.35",
     "web3-core-promievent": "^1.0.0-beta.36",
-    "web3-providers-ws": "^1.0.0-beta.36"
-  },
-  "devDependencies": {}
+    "web3-providers-ws": "^1.0.0-beta.36",
+    "websocket": "^1.0.28"
+  }
 }

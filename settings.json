@@ -1,6 +1,7 @@
 {
   "public":{
-    "infura":"https://ropsten.infura.io/v3/143f9cf968fe4c3da0db77ff525e0da4",
+    "network_id":6000, 
+    "infura":"https://ropsten.infura.io/v3/",
     "infurawss":"wss://ropsten.infura.io/ws"
   }
 }
