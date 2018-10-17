@@ -14,35 +14,33 @@ https://www.meteor.com/install
 
 ### Deployment of the contracts:
 This installation will also deploy your contracts to the network you choose (Ganache, Ropsten, etc.). 
-1. Get POC2 project from: https://github.com/GoodDollar/poc2
+You will first need to get POC2 project from: https://github.com/GoodDollar/poc2
 
-Choose Step 2 or step 3 according to the chosen network:
+Choose according to the chosen network:
 
-2. To use with Ropsten / Hosted Blockchain:
+__To use with Ropsten / Hosted Blockchain__:
 
-
-  2.1.	Create “secrets.json” file similar to “secrets-example.json”, use your mnemonic & ropsten API.
-
-  2.2. Install:
+1.	Create “secrets.json” file similar to “secrets-example.json”, use your mnemonic & ropsten API.
+2. Install:
   
 ```
 npm install
 ```
 
-  2.3. Deploy the contracts:
+3. Deploy the contracts:
 ```
 truffle migrate --network ropsteninfura
 ```
 
-3. To use with Ganache:
-  3.1	Verify Ganache is up and running.
-  3.2.	In “truffle.js”, Modify “from” key under “development” and “test” networks according to your first address ganache UI.
-  3.3. Install:
+__To use with Ganache__
+1. Verify Ganache is up and running.
+2. In “truffle.js”, Modify “from” key under “development” and “test” networks according to your first address ganache UI.
+3. Install:
 ```
 npm install
 ```
 
-  3.4. Deploy the contracts:
+4. Deploy the contracts:
 ```
 truffle migrate --network development
 ```
