@@ -18,6 +18,7 @@ This installation will also deploy your contracts to the network you choose (Gan
 
 Choose Step 2 or step 3 according to the chosen network:
 2. To use with Ropsten / Hosted Blockchain:
+
 ⋅⋅⋅2.1.	Create “secrets.json” file similar to “secrets-example.json”, use your mnemonic & ropsten API.
 ⋅⋅⋅2.2. Install:
 ```
