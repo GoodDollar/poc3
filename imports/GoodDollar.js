@@ -8,12 +8,15 @@ import _ from 'lodash'
 import RedemptionContract from '/imports/contracts/RedemptionFunctional.json'
 import GoodDollarContract from '/imports/contracts/GoodCoin.json'
 import MarketContract from '/imports/contracts/GoodCoinMarket.json'
+import abi from '/imports/abi.js'
+
 // $FlowFixMe
 import Web3 from 'web3'
 // $FlowFixMe
 import Web3PromieEvent from 'web3-core-promievent'
 import WebsocketProvider from 'web3-providers-ws'
 import {promisifyTxHash} from '/imports/web3utils.js'
+import GoodDollarUtils from '/imports/GoodDollarUtils.js'
 import ethUtils from 'ethereumjs-util'
 
 export default class GoodDollar {
@@ -28,20 +31,42 @@ export default class GoodDollar {
   netword_id:number
 
 
+  // adrress: The address that deployed the GoodDollar contract
+  // pKey: privateKey of account owner of the address above
   constructor(addr:string,pkey:string) {
     // $FlowFixMe
     this.addr = addr
     this.pkey = pkey
     this.publicKey = ethUtils.privateToPublic(ethUtils.toBuffer(pkey))
-    this.web3 = new Web3(new WebsocketProvider(Meteor.settings.public.infurawss))
+    this.web3 = new Web3(new WebsocketProvider(Meteor.settings.public.web3provider)) // can be - "wss://ropsten.infura.io/ws" or "ws://localhost:8545" or any other.
+        
     this.web3.eth.accounts.wallet.add(pkey)
     this.web3.eth.defaultAccount = addr
-    this.netword_id = Meteor.settings.public.network_id // ropsten network
-    this.accountsContract = new this.web3.eth.Contract(RedemptionContract.abi,RedemptionContract.networks[this.netword_id],{from:addr})
-    this.tokenContract = new this.web3.eth.Contract(GoodDollarContract.abi,GoodDollarContract.networks[this.netword_id],{from:addr})
-    this.marketContract = new this.web3.eth.Contract(MarketContract.abi,MarketContract.networks[this.netword_id],{from:addr})
+    this.netword_id = Meteor.settings.public.network_id 
+    this.accountsContract = new this.web3.eth.Contract(abi,RedemptionContract.networks[this.netword_id],{from:addr})
+    this.tokenContract = new this.web3.eth.Contract(abi,GoodDollarContract.networks[this.netword_id],{from:addr})
+    this.marketContract = new this.web3.eth.Contract(abi,MarketContract.networks[this.netword_id],{from:addr})
     this.gasPrice = this.web3.eth.getGasPrice()
+    this.tokenDecimals = 4 // default. will be overriden by the coin contract
+    this.goodDollarUtils = undefined // will be set once the token decimals are initialized
+    
+    console.log("debug")
+    //console.log(this.web3.version.network)
+    this.web3.eth.net.getId().then(console.log)
+
+    
+
+    this.tokenContract.methods.decimals().call().then(((err,res)=>{
+      this.tokenDecimals = res;
+      this.goodDollarUtils = new GoodDollarUtils(this.web3, this.marketContract, this.tokenDecimals)  
+    }).bind(this))
+
+    this.goodDollarUtils = new GoodDollarUtils(this.web3, this.marketContract, this.tokenDecimals)  
+
+    
   }
+
+  
 
   balanceChanged(callback:(error,event) => any) {
     let handler = this.tokenContract.events.Transfer({fromBlock:'latest',filter:{'from':this.addr}},callback)
@@ -50,7 +75,7 @@ export default class GoodDollar {
   }
   balanceOf():Promise<Number> {
     return this.tokenContract.methods.balanceOf(this.addr).call().then(b => {
-      b = this.web3.utils.fromWei(b, 'ether')
+      b = goodDollarUtils.fromGDUnits(b, '0');
       return b
     })
   }
@@ -74,7 +99,7 @@ export default class GoodDollar {
   }
 
   async sell(gdAmount):Promise<[typeof Web3PromieEvent]> {
-    let amount = this.web3.utils.toWei(gdAmount, "ether");
+    amount = this.GoodDollarUtils.toGDUnits(amount, '0');
     try
     {
       let gas = await this.marketContract.methods.sell(amount).estimateGas()
@@ -94,12 +119,12 @@ export default class GoodDollar {
     let amount = this.web3.utils.toWei(ethAmount, "ether");
     console.log(`amount: ${amount}`);
     return this.marketContract.methods.calculateAmountPurchased(amount).call().then(b => {
-      b = this.web3.utils.fromWei(b, 'ether')
+      b = this.goodDollarUtils.fromGDUnits(b, '0');
       return b
     })
   }
   getSellPrice(gdAmount:Number):Promise<Number> {
-    let amount = this.web3.utils.toWei(gdAmount, "ether");
+    amount = this.GoodDollarUtils.toGDUnits(amount, '0');
     console.log(`amount: ${amount}`);
     return this.marketContract.methods.calculatePriceForSale(amount).call().then(b => {
       b = this.web3.utils.fromWei(b, 'ether')

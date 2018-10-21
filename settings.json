@@ -1,7 +1,6 @@
 {
   "public":{
     "network_id":6000, 
-    "infura":"https://ropsten.infura.io/v3/",
-    "infurawss":"wss://ropsten.infura.io/ws"
+    "web3provider":"ws://localhost:8545" 
   }
 }
