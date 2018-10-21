@@ -96,7 +96,9 @@ export class Blockstack {
       this.profile = await blockstack.getFile("profile.js",{username,app:Meteor.absoluteUrl("/"),decrypt:false}).then(file => file? JSON.parse(file):{}).catch(e => {return {}})
     return this.profile || {}
   }
+  
   getUserEthAddr() {
+    debugger;
     const appPrivateKey = this.userData.appPrivateKey
     const privateKey = new Buffer(appPrivateKey, 'hex')
     const address = '0x' + ethUtils.privateToAddress(privateKey).toString('hex')

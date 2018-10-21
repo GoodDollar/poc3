@@ -8,7 +8,6 @@ import _ from 'lodash'
 import RedemptionContract from '/imports/contracts/RedemptionFunctional.json'
 import GoodDollarContract from '/imports/contracts/GoodCoin.json'
 import MarketContract from '/imports/contracts/GoodCoinMarket.json'
-import abi from '/imports/abi.js'
 
 // $FlowFixMe
 import Web3 from 'web3'
@@ -43,26 +42,22 @@ export default class GoodDollar {
     this.web3.eth.accounts.wallet.add(pkey)
     this.web3.eth.defaultAccount = addr
     this.netword_id = Meteor.settings.public.network_id 
-    this.accountsContract = new this.web3.eth.Contract(abi,RedemptionContract.networks[this.netword_id],{from:addr})
-    this.tokenContract = new this.web3.eth.Contract(abi,GoodDollarContract.networks[this.netword_id],{from:addr})
-    this.marketContract = new this.web3.eth.Contract(abi,MarketContract.networks[this.netword_id],{from:addr})
+    this.accountsContract = new this.web3.eth.Contract(RedemptionContract.abi,RedemptionContract.networks[this.netword_id].address,{from:addr})
+    this.tokenContract = new this.web3.eth.Contract(GoodDollarContract.abi,GoodDollarContract.networks[this.netword_id].address,{from:addr})
+    this.marketContract = new this.web3.eth.Contract(MarketContract.abi,MarketContract.networks[this.netword_id].address,{from:addr})
     this.gasPrice = this.web3.eth.getGasPrice()
     this.tokenDecimals = 4 // default. will be overriden by the coin contract
     this.goodDollarUtils = undefined // will be set once the token decimals are initialized
-    
-    console.log("debug")
-    //console.log(this.web3.version.network)
-    this.web3.eth.net.getId().then(console.log)
-
-    
-
-    this.tokenContract.methods.decimals().call().then(((err,res)=>{
-      this.tokenDecimals = res;
+    this.tokenContract.methods.decimals().call().then(((res,err)=>{
+      if (!err){
+        this.tokenDecimals = res;
+      }else{
+        console.error(err);
+        console.warning("# of decimals failed to load from GoodDollar contract, using default number:"+this.tokenDecimals);
+      }
       this.goodDollarUtils = new GoodDollarUtils(this.web3, this.marketContract, this.tokenDecimals)  
+      
     }).bind(this))
-
-    this.goodDollarUtils = new GoodDollarUtils(this.web3, this.marketContract, this.tokenDecimals)  
-
     
   }
 
@@ -75,7 +70,7 @@ export default class GoodDollar {
   }
   balanceOf():Promise<Number> {
     return this.tokenContract.methods.balanceOf(this.addr).call().then(b => {
-      b = goodDollarUtils.fromGDUnits(b, '0');
+      b = this.goodDollarUtils.fromGDUnits(b, '0');
       return b
     })
   }
