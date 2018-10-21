@@ -54,10 +54,17 @@ This installation assumes your contracts were deployed to the network you chose 
     a.“Addr” should be the same address that deployed the contracts
     b.	“pkey”: the above account private key (Verify your key has “0x” prefix, otherwise please add it)
     
-3.	Modify settings.json set “network_id” as follows:
+3.	Modify settings.json:
+
+set “network_id” as follows:
 
     a.	6000 (ganache), or  
     b.	3 (ropsten) // or any other hosted blockchain provider id
+    
+set “web3provider” as follows:
+    a.	ws://localhost:8545, or  // in case you are running local ganache on this port (verify ganache port)
+    b.	wss://ropsten.infura.io/ws (infura to gateway ropsten) // or any other web3 provider that supports websockets
+    
 4.	Install:
 ```
 npm install
