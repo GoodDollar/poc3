@@ -11,6 +11,9 @@ These instructions will get you a copy of the project up and running on your loc
 Install Meteor.js:
 https://www.meteor.com/install
 
+Install Ganache:
+https://truffleframework.com/ganache
+
 
 ### Deployment of the contracts:
 This installation will also deploy your contracts to the network you choose (Ganache, Ropsten, etc.). 
