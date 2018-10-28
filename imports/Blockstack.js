@@ -98,12 +98,14 @@ export class Blockstack {
   }
   
   getUserEthAddr() {
-    debugger;
+    
     const appPrivateKey = this.userData.appPrivateKey
     const privateKey = new Buffer(appPrivateKey, 'hex')
     const address = '0x' + ethUtils.privateToAddress(privateKey).toString('hex')
+    console.log("user public address:"+address);
     return address
   }
+
   init() {
     let loginPromise
     if(blockstack.isUserSignedIn()) loginPromise = Promise.resolve({})
@@ -111,11 +113,13 @@ export class Blockstack {
         loginPromise = blockstack.handlePendingSignIn()
     } else return Promise.resolve({})
     return loginPromise.then(async () => {
+      
       this.userData = blockstack.loadUserData()
       let gdProfile = await this.getGDProfile()
       if(_.get(gdProfile,'address')==undefined)
       {
         gdProfile.address = this.getUserEthAddr()
+        console.log("user logged:"+gdProfile.address)
         let res = await blockstack.putFile("profile.js",JSON.stringify(gdProfile),{encrypt:false})
       }
       this.goodDollar = new GoodDollar(this.getUserEthAddr(),'0x'+this.userData.appPrivateKey)

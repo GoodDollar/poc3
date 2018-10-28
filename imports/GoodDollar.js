@@ -23,7 +23,7 @@ export default class GoodDollar {
   web3:Web3;
   accountsContract:Web3.eth.Contract
   tokenContract:Web3.eth.Contract
-  gasPrice:number
+  gasPrice:Promise<number>
   pkey:string
   addr:string
   publicKey:Buffer
@@ -38,7 +38,6 @@ export default class GoodDollar {
     this.pkey = pkey
     this.publicKey = ethUtils.privateToPublic(ethUtils.toBuffer(pkey))
     this.web3 = new Web3(new WebsocketProvider(Meteor.settings.public.web3provider)) // can be - "wss://ropsten.infura.io/ws" or "ws://localhost:8545" or any other.
-        
     this.web3.eth.accounts.wallet.add(pkey)
     this.web3.eth.defaultAccount = addr
     this.netword_id = Meteor.settings.public.network_id 
@@ -48,61 +47,85 @@ export default class GoodDollar {
     this.gasPrice = this.web3.eth.getGasPrice()
     this.tokenDecimals = 4 // default. will be overriden by the coin contract
     this.goodDollarUtils = undefined // will be set once the token decimals are initialized
+   
+    
+    this.goodDollarUtils = new GoodDollarUtils(this.web3, this.marketContract, this.tokenDecimals) // will be override when token decimals are returned from the contract
     this.tokenContract.methods.decimals().call().then(((res,err)=>{
       if (!err){
         this.tokenDecimals = res;
+        this.goodDollarUtils = new GoodDollarUtils(this.web3, this.marketContract, this.tokenDecimals)  
       }else{
         console.error(err);
         console.warning("# of decimals failed to load from GoodDollar contract, using default number:"+this.tokenDecimals);
       }
-      this.goodDollarUtils = new GoodDollarUtils(this.web3, this.marketContract, this.tokenDecimals)  
+      
       
     }).bind(this))
     
   }
 
-  
 
   balanceChanged(callback:(error,event) => any) {
     let handler = this.tokenContract.events.Transfer({fromBlock:'latest',filter:{'from':this.addr}},callback)
     let handler2 = this.tokenContract.events.Transfer({fromBlock:'latest',filter:{'to':this.addr}},callback)
-    return [handler,handler2]
+    let burnHandler = this.tokenContract.events.Burn({fromBlock:'latest',filter:{'burner':this.addr}},callback)
+    let mintHandler = this.tokenContract.events.Mint({fromBlock:'latest',filter:{'to':this.addr}},callback)
+    return [handler,handler2,burnHandler,mintHandler]
   }
+
+  ethBalanceOf():Promise<Number> {
+    let web3 = this.web3
+    let addr = this.addr
+    return new Promise(function (resolve, reject) {
+      web3.eth.getBalance(addr).then(
+
+        function (res) {
+          resolve(web3.utils.fromWei(res, 'ether'));
+
+        });
+    }).catch(console.log)
+  }
+
+
   balanceOf():Promise<Number> {
-    return this.tokenContract.methods.balanceOf(this.addr).call().then(b => {
+    return this.tokenContract.methods.balanceOf(this.addr).call({'from': this.addr}).then(b => {
       b = this.goodDollarUtils.fromGDUnits(b, '0');
       return b
     })
   }
   async buy(ethAmount):Promise<[typeof Web3PromieEvent]> {
-    let amount = this.web3.utils.toWei(ethAmount, "ether");
     try
     {
-      let gas = (await this.marketContract.methods.buy().estimateGas({value:amount}))
-      let gasPrice = (await this.gasPrice)*2
-      console.log({gas,gasPrice,amount})
+      let amount = this.web3.utils.toWei(ethAmount, "ether");
+      let gasUnits = (await this.marketContract.methods.buy().estimateGas({value:amount}))
+      gasUnits = gasUnits * 2
+      let gasPrice = await this.gasPrice
+      console.log({gasUnits,gasPrice,amount})
       let txPromise:Web3PromieEvent = this.marketContract.methods.buy().send({
-        gasPrice,
-        gas,
+       
+        gasPrice:gasPrice,
+        gas:gasUnits,
         value: amount
       })
       return [txPromise]
     }
     catch(e) {
+      console.error(e)
       return [Promise.reject(e)]
     }
   }
 
   async sell(gdAmount):Promise<[typeof Web3PromieEvent]> {
-    amount = this.GoodDollarUtils.toGDUnits(amount, '0');
+    let amount = this.goodDollarUtils.toGDUnits(gdAmount, '0');
     try
     {
-      let gas = await this.marketContract.methods.sell(amount).estimateGas()
-      let gasPrice = (await this.gasPrice)*2
-      console.log({gas,gasPrice,amount})
+      let gasUnits = await this.marketContract.methods.sell(amount).estimateGas()
+      gasUnits = gasUnits * 2
+      let gasPrice = await this.gasPrice
+      console.log({gasUnits,gasPrice,amount})
       let txPromise:Web3PromieEvent = this.marketContract.methods.sell(amount).send({
-        gasPrice,
-        gas
+        gasPrice:gasPrice,
+        gas:gasUnits
       })
       return [txPromise]
     }
@@ -119,7 +142,7 @@ export default class GoodDollar {
     })
   }
   getSellPrice(gdAmount:Number):Promise<Number> {
-    amount = this.GoodDollarUtils.toGDUnits(amount, '0');
+    let amount = this.goodDollarUtils.toGDUnits(gdAmount, '0');
     console.log(`amount: ${amount}`);
     return this.marketContract.methods.calculatePriceForSale(amount).call().then(b => {
       b = this.web3.utils.fromWei(b, 'ether')
@@ -127,12 +150,25 @@ export default class GoodDollar {
     })
   }
   checkEntitlement():Promise<Number> {
-    return this.accountsContract.methods.checkEntitlement().call().then(b => {
+    console.log("this.addr="+this.addr);
+    return this.accountsContract.methods.checkEntitlement().call({ 'from': this.addr }).then(b => {
+      console.log("checkEntitlement(), response="+b);
       b = this.web3.utils.fromWei(b, 'ether')
       return b
     })
   }
 
+  checkWhiteListStatus():Promise<Boolean> { 
+      console.log("this.addr="+this.addr);
+      return this.accountsContract.methods.checkWhiteListStatus().call().then(b => {
+        console.log("checkWhiteListStatus(), response="+b);
+        return b
+      })
+    
+
+ 
+  
+  }
   async claim():Promise<[typeof Web3PromieEvent]> {
     try
     {

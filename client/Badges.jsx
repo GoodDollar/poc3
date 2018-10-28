@@ -42,6 +42,7 @@ class Badges extends React.Component {
         placement: 'bottom',
         disableBeacon: true,
       },
+    
       {
         target: '#trust',
         content: <div><h2 style={style.stepHeadline}>Increase Your TrustScore</h2><h3 style={{lineHeight:'25px'}}><List><ListItem style={{color:'black'}} leftIcon={<ActionInfo/>}>Vouch for people you know. </ListItem><ListItem style={{color:'black'}} leftIcon={<ActionInfo/>}>Collect credit history by spending and recieving credits!</ListItem></List></h3></div>,
@@ -82,17 +83,47 @@ class Badges extends React.Component {
       console.log(e)
       return 0
     })
-    let pending = await Blockstack.goodDollar.checkEntitlement().catch(e => {
+
+    let ethBalance =  await Blockstack.goodDollar.ethBalanceOf().catch(e => {
       console.log(e)
       return 0
     })
+
+    let whitelisted =  await Blockstack.goodDollar.checkWhiteListStatus()
+    .catch(e => {
+      console.log(e)
+      return 0
+    })
+
+    this.setState({whitelisted:whitelisted});
+
+    let pending = false
+
+    if (whitelisted){
+        pending = await Blockstack.goodDollar.checkEntitlement().catch(e => {
+          console.log(e)
+          return 0
+        })
+     }
+
     let changed = this.state.balance!=balance
+    
     if(changed)
       setTimeout(() => this.setState({balanceChanged:''}),800)
     this.setState({
       trustScore: 5,
       balance: balance,
       balanceChanged: changed?'changed':'',
+      pending
+    })
+
+    let ethChanged = this.state.ethBalance!=ethBalance
+    if(ethChanged)
+      setTimeout(() => this.setState({ethBalanceChanged:''}),800)
+    this.setState({
+      trustScore: 5,
+      ethBalance: ethBalance,
+      ethBalanceChanged: ethChanged?'changed':'',
       pending
     })
 
@@ -141,13 +172,19 @@ class Badges extends React.Component {
             <AccountBalanceWalletIcon style={style.icons}/>
             <span>Balance: <span style={{color:this.state.balance<=0?Colors.red500:''}}>{this.state.balance}</span></span>
           </div>
-          <div id='pending'>
+          <div id='ethBalance' className={`ethBalanceChanged ${this.state.ethBalanceChanged}`}>
+            <AccountBalanceWalletIcon style={style.icons}/>
+            <span>ETH Balance: <span style={{color:this.state.ethBalance<=0?Colors.red500:''}}>{this.state.ethBalance}</span></span>
+          </div>
+
+          {this.state.whitelisted &&  <div id='pending' >
             <div>
               <LoyaltyIcon style={style.icons}/>
               <span>Pending: {this.state.pending}</span>
             </div>
             <div><TxButton onClick={() => Blockstack.goodDollar.claim()}>Claim</TxButton></div>
           </div>
+          }
           <div id='logout' >
             <FlatButton onClick={() => blockstack.signUserOut('/login')}>Logout</FlatButton>
           </div>

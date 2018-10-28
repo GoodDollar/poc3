@@ -119,6 +119,7 @@ export class VerifyHumanProofs extends React.Component {
     },1000)
   }
   async recheck() {
+    console.log("reloading profile")
     await Blockstack.reloadProfile()
     Meteor.call('verifySocial',Blockstack.userData,(err,res) => {
       console.log("verifySocial cb",err,res)
@@ -126,6 +127,9 @@ export class VerifyHumanProofs extends React.Component {
         this.recheckHumanProofs()
       else this.setState({closed:true,verified:false})
     })
+
+    console.log("profile reloaded, updating server.")
+    //Meteor.call('verifySocial',Blockstack.userData)
 
 
 

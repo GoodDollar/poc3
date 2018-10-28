@@ -18,6 +18,7 @@ type OpenAccountResult = {
 
 
 const openGDAccount = async (user:typeof Blockstack):Promise<OpenAccountResult> => {
+  debugger;
   if(!Blockstack.hasGDAttestation(BS.Attestations.ACCOUNT_CREATED))
   {
       let [tx:Web3PromieEvent,txHashPromise:Promise<string>] = await GoodDollarAdmin.createAccount(Blockstack.getUserEthAddr(),Blockstack.userData.decentralizedID)
@@ -38,6 +39,7 @@ Meteor.methods({
       await Blockstack.setUserData(userData)
       console.log("verifySocial",userData.profile)
       let res = await Blockstack.isSocialVerified()
+      console.log("isSocialVerified",res)
       return {verified:res}
   },
   async 'verifyHumanProofsAndWhitelist'(userData) {
